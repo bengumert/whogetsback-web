@@ -1,0 +1,13 @@
+# Sistem dosyaları
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editör
+.vscode/
+.idea/
+
+# Bağımlılıklar / loglar (ileride gerekirse)
+node_modules/
+npm-debug.log*
+*.log

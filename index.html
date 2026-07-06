@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhoGetsBack · Hızlı Hesap</title>
+  <link rel="icon" href="images/icon.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style type="text/tailwindcss">
+    @theme {
+      --color-brand: #4527A0;
+      --color-brand-dark: #311B92;
+      --color-brand-light: #F3E5F5;
+      --color-brand-accent: #7E57C2;
+      --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+    }
+    @layer base {
+      html { -webkit-tap-highlight-color: transparent; }
+      body { background: linear-gradient(160deg, #F3E5F5 0%, #EDE7F6 100%); }
+    }
+    @keyframes popIn {
+      0%   { opacity: 0; transform: scale(.85) rotate(-2deg); }
+      100% { opacity: 1; transform: scale(1)   rotate(-1deg); }
+    }
+    .postit-anim { animation: popIn .28s cubic-bezier(.34,1.56,.64,1) both; }
+    @keyframes slideUp {
+      0%   { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .slide-up { animation: slideUp .35s ease both; }
+    .no-spin::-webkit-outer-spin-button,
+    .no-spin::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .no-spin { -moz-appearance: textfield; appearance: textfield; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: #b39ddb; border-radius: 8px; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 font-sans antialiased">
+
+  <div class="max-w-3xl mx-auto px-4 py-6 sm:py-10">
+
+    <!-- ── Header ─────────────────────────────────────────── -->
+    <header class="flex flex-col items-center text-center mb-8 slide-up">
+      <img src="images/logo.png" alt="WhoGetsBack"
+           class="h-16 sm:h-20 w-auto drop-shadow-md mb-3 select-none pointer-events-none" />
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-brand tracking-tight">
+        WhoGetsBack <span class="text-brand-accent font-semibold"></span>
+      </h1>
+      <p class="text-sm text-brand/70 mt-1">Kayıt yok · Anlık hesaplar · Kuruşu kuruşuna hesaplaşmaa</p>
+    </header>
+
+    <!-- ── 1) Katılımcılar ────────────────────────────────── -->
+    <section class="bg-white/80 backdrop-blur rounded-2xl shadow-lg shadow-brand/5 border border-white p-5 sm:p-6 mb-6 slide-up">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="grid place-items-center h-8 w-8 rounded-full bg-brand text-white text-sm font-bold">1</span>
+        <h2 class="text-lg font-bold text-brand-dark">Katılımcılar</h2>
+        <span id="peopleCount" class="ml-auto text-xs font-semibold text-brand bg-brand-light px-3 py-1 rounded-full">0 kişi</span>
+      </div>
+
+      <form id="personForm" class="flex gap-2">
+        <input id="personName" type="text" autocomplete="off" placeholder="İsim ekle (harcama yapmasa da)…"
+               class="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/60 transition" />
+        <button type="submit"
+                class="shrink-0 rounded-xl bg-brand hover:bg-brand-dark active:scale-95 text-white font-semibold px-5 transition shadow-md shadow-brand/30">
+          Ekle
+        </button>
+      </form>
+
+      <div id="peopleList" class="flex flex-wrap gap-2 mt-4"></div>
+      <p id="peopleEmpty" class="text-sm text-slate-400 mt-4">Henüz kimse eklenmedi.</p>
+    </section>
+
+    <!-- ── 2) Harcamalar ──────────────────────────────────── -->
+    <section class="bg-white/80 backdrop-blur rounded-2xl shadow-lg shadow-brand/5 border border-white p-5 sm:p-6 mb-6 slide-up">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="grid place-items-center h-8 w-8 rounded-full bg-brand text-white text-sm font-bold">2</span>
+        <h2 class="text-lg font-bold text-brand-dark">Harcamalar</h2>
+      </div>
+
+      <form id="expenseForm" class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+        <input id="expTitle" type="text" autocomplete="off" placeholder="Ne için? (örn. Akşam yemeği)"
+               class="sm:col-span-5 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/60 transition" />
+        <input id="expAmount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="Tutar ₺"
+               class="no-spin sm:col-span-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/60 transition" />
+        <select id="expPayer"
+                class="sm:col-span-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/60 transition">
+          <option value="">Ödeyen…</option>
+        </select>
+        <button type="submit"
+                class="sm:col-span-1 grid place-items-center rounded-xl bg-brand-accent hover:bg-brand active:scale-95 text-white font-bold text-xl transition shadow-md shadow-brand/30 py-3">
+          +
+        </button>
+      </form>
+
+      <div id="expenseList" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5"></div>
+      <p id="expenseEmpty" class="text-sm text-slate-400 mt-4">Henüz harcama eklenmedi.</p>
+    </section>
+
+    <!-- ── 3) Hesapla ─────────────────────────────────────── -->
+    <button id="calcBtn"
+            class="w-full rounded-2xl bg-gradient-to-r from-brand-dark to-brand-accent text-white font-extrabold text-lg py-4 shadow-xl shadow-brand/30 hover:brightness-110 active:scale-[.99] transition mb-6 slide-up">
+      Hesapla
+    </button>
+
+    <!-- ── 4) Sonuçlar ────────────────────────────────────── -->
+    <section id="results" class="hidden"></section>
+
+    <!-- ── Mobil uygulama ─────────────────────────────────── -->
+    <section class="mt-10 slide-up">
+      <div class="bg-white/80 backdrop-blur rounded-2xl shadow-lg shadow-brand/5 border border-white p-6 text-center">
+        <img src="images/icon.png" alt="WhoGetsBack uygulaması"
+             class="h-14 w-14 rounded-2xl mx-auto shadow-md mb-3 select-none" />
+        <h3 class="text-lg font-bold text-brand-dark">Grup hesaplarını her zaman yanında taşı</h3>
+        <p class="text-sm text-brand/70 mt-1 max-w-md mx-auto">
+          Bu web sürümü tek günlük etkinlikler için hızlı bir çözümdür. Etkinliklerini kaydetmek,
+          arkadaşlarınla ortak listeler tutmak ve geçmiş harcamalarına ulaşmak için ücretsiz mobil uygulamayı indir.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mt-5">
+          <a href="https://apps.apple.com/tr/app/whogetsback/id6762367734?l=tr" target="_blank" rel="noopener"
+             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark active:scale-95 text-white font-semibold px-6 py-3 rounded-xl shadow-md shadow-brand/30 transition">
+            <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.417 2.2-1.11 3.02-.85.99-2.22 1.75-3.42 1.66-.14-1.1.42-2.28 1.06-3.02.79-.92 2.19-1.6 3.32-1.66.02.02.15.13.15 0zM20.5 17.03c-.6 1.38-.89 2-1.66 3.22-1.07 1.7-2.58 3.82-4.45 3.83-1.66.02-2.09-1.08-4.35-1.07-2.26.01-2.73 1.09-4.4 1.08-1.87-.01-3.3-1.92-4.37-3.62C-1.1 15.9-.4 8.87 3.5 8.61c1.7-.11 2.9 1.08 3.98 1.08 1.03 0 2.83-1.34 4.78-1.14.81.03 3.09.33 4.55 2.47-3.98 2.34-3.34 7.9.69 6.01z"/></svg>
+            App Store'dan İndir
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.bengumert.whogetsback" target="_blank" rel="noopener"
+             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-brand-accent hover:bg-brand active:scale-95 text-white font-semibold px-6 py-3 rounded-xl shadow-md shadow-brand/30 transition">
+            <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current" aria-hidden="true"><path d="M3.6 1.8c-.3.32-.48.8-.48 1.44v17.52c0 .64.18 1.12.48 1.44l.06.06 9.82-9.82v-.24L3.66 1.74l-.06.06zm13.3 13.3l-2.28-2.28 2.55-2.55 2.9 1.65c.83.47.83 1.24 0 1.71l-3.17 1.47zm-2.83-2.83L4.5 22.05c.3.28.79.32 1.35.02l10.62-6.03-2.4-2.4zm0-1.53l2.4-2.4L5.85 1.93C5.29 1.63 4.8 1.67 4.5 1.95l9.57 9.57z"/></svg>
+            Google Play'den İndir
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-center text-xs text-brand/50 mt-8 pb-6">
+      WhoGetsBack · Kim kime ne kadar borçlu, kuruşu kuruşuna.
+    </footer>
+  </div>
+
+  <!-- ── Toast ─────────────────────────────────────────────── -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-brand-dark text-white text-sm font-medium px-5 py-3 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-50"></div>
+
+  <script>
+  // ══════════════════════════════════════════════════════════
+  //  WhoGetsBack Web — Durum
+  //  Tüm para birimi mobil uygulamadaki gibi KURUŞ (cent) cinsinden tutulur.
+  // ══════════════════════════════════════════════════════════
+  const state = {
+    people: [],      // [{ id, name }]
+    expenses: [],    // [{ id, title, amountCents, payer }]
+  };
+
+  const POSTIT_TONES = [
+    'bg-[#EDE7F6] border-[#D1C4E9]',
+    'bg-[#F3E5F5] border-[#E1BEE7]',
+    'bg-[#E8EAF6] border-[#C5CAE9]',
+    'bg-[#EDE7F6] border-[#B39DDB]',
+  ];
+
+  // ── Yardımcılar ─────────────────────────────────────────
+  const $ = (s) => document.querySelector(s);
+  const uid = () => Math.random().toString(36).slice(2, 9);
+
+  function toCents(tl) {
+    // Ondalık kayan nokta hatalarını önlemek için yuvarla
+    return Math.round(parseFloat(tl) * 100);
+  }
+  function fmtTL(cents) {
+    return (cents / 100).toLocaleString('tr-TR', {
+      minimumFractionDigits: 2, maximumFractionDigits: 2,
+    }) + ' ₺';
+  }
+  function fmtTLnum(tl) {
+    return tl.toLocaleString('tr-TR', {
+      minimumFractionDigits: 2, maximumFractionDigits: 2,
+    }) + ' ₺';
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[c]));
+  }
+
+  // ── Render: Katılımcılar ────────────────────────────────
+  function renderPeople() {
+    const list = $('#peopleList');
+    list.innerHTML = '';
+    $('#peopleEmpty').classList.toggle('hidden', state.people.length > 0);
+    $('#peopleCount').textContent = state.people.length + ' kişi';
+
+    state.people.forEach((p) => {
+      const chip = document.createElement('div');
+      chip.className = 'group flex items-center gap-2 bg-brand-light border border-[#D1C4E9] text-brand-dark rounded-full pl-4 pr-2 py-2 text-sm font-medium shadow-sm';
+      chip.innerHTML = `
+        <span>${escapeHtml(p.name)}</span>
+        <button title="Sil" class="grid place-items-center h-5 w-5 rounded-full bg-brand/10 hover:bg-red-500 hover:text-white text-brand transition text-xs font-bold leading-none">×</button>`;
+      chip.querySelector('button').onclick = () => removePerson(p.id);
+      list.appendChild(chip);
+    });
+    renderPayerOptions();
+  }
+
+  function renderPayerOptions() {
+    const sel = $('#expPayer');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">Ödeyen…</option>';
+    state.people.forEach((p) => {
+      const o = document.createElement('option');
+      o.value = p.name;
+      o.textContent = p.name;
+      sel.appendChild(o);
+    });
+    if (state.people.some((p) => p.name === current)) sel.value = current;
+  }
+
+  // ── Render: Harcamalar (Post-it) ────────────────────────
+  function renderExpenses() {
+    const list = $('#expenseList');
+    list.innerHTML = '';
+    $('#expenseEmpty').classList.toggle('hidden', state.expenses.length > 0);
+
+    state.expenses.forEach((e, i) => {
+      const tone = POSTIT_TONES[i % POSTIT_TONES.length];
+      const card = document.createElement('div');
+      card.className = `postit-anim relative ${tone} border rounded-lg p-3 shadow-md shadow-brand/10 -rotate-1 hover:rotate-0 hover:-translate-y-0.5 transition-transform`;
+      card.innerHTML = `
+        <button title="Sil" class="absolute -top-2 -right-2 grid place-items-center h-6 w-6 rounded-full bg-white border border-[#D1C4E9] text-brand hover:bg-red-500 hover:text-white hover:border-red-500 transition text-sm font-bold shadow">×</button>
+        <p class="font-semibold text-brand-dark text-sm leading-snug break-words pr-3">${escapeHtml(e.title)}</p>
+        <p class="text-lg font-extrabold text-brand mt-2">${fmtTL(e.amountCents)}</p>
+        <div class="flex items-center gap-1 mt-2 text-xs text-brand-dark/70">
+          <span class="grid place-items-center h-5 w-5 rounded-full bg-brand text-white text-[10px] font-bold">${escapeHtml(e.payer.charAt(0).toUpperCase())}</span>
+          <span class="font-medium truncate">${escapeHtml(e.payer)}</span>
+        </div>`;
+      card.querySelector('button').onclick = () => removeExpense(e.id);
+      list.appendChild(card);
+    });
+  }
+
+  // ── Aksiyonlar ──────────────────────────────────────────
+  function addPerson(name) {
+    name = name.trim();
+    if (!name) return;
+    if (state.people.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
+      toast('Bu isim zaten var.');
+      return;
+    }
+    state.people.push({ id: uid(), name });
+    renderPeople();
+  }
+  function removePerson(id) {
+    state.people = state.people.filter((p) => p.id !== id);
+    renderPeople();
+  }
+  function addExpense(title, amountTL, payer) {
+    title = title.trim();
+    const cents = toCents(amountTL);
+    if (!title) return toast('Harcama başlığı gir.');
+    if (!(cents > 0)) return toast('Geçerli bir tutar gir.');
+    if (!payer) return toast('Ödeyen kişiyi seç.');
+    state.expenses.push({ id: uid(), title, amountCents: cents, payer });
+    renderExpenses();
+  }
+  function removeExpense(id) {
+    state.expenses = state.expenses.filter((e) => e.id !== id);
+    renderExpenses();
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  HESAPLAMA — mobil uygulamadaki calculateBalances + _resolveDebts
+  //  (Greedy Match) birebir port edilmiştir. Her şey kuruş cinsinden.
+  // ══════════════════════════════════════════════════════════
+  const isNearZero = (v) => Math.abs(v) < 0.01;
+
+  function calculateBalances() {
+    const participantCount = state.people.length;
+
+    if (participantCount === 0) return { error: 'Önce katılımcı ekleyin.' };
+    if (state.expenses.length === 0) return { error: 'Önce harcama ekleyin.' };
+
+    // 1) Toplam ve kişi başına ödenenler (kuruş)
+    let totalCents = 0;
+    const paidCents = {}; // name -> cents
+    state.people.forEach((p) => (paidCents[p.name] = 0));
+
+    state.expenses.forEach((e) => {
+      totalCents += e.amountCents;
+      if (paidCents[e.payer] === undefined) paidCents[e.payer] = 0;
+      paidCents[e.payer] += e.amountCents;
+    });
+
+    // 2) Kişi başı pay (kuruş) — harcama yapmayanlar 0 ₺ ödemiş sayılır
+    const perPersonCents = totalCents / participantCount;
+
+    // 3) Net bakiyeler (TL, 2 hane) — mobildeki mantık
+    const balancesTL = {};
+    state.people.forEach((p) => {
+      const netCents = (paidCents[p.name] || 0) - perPersonCents;
+      const netTL = netCents / 100;
+      if (!isNearZero(netTL)) {
+        balancesTL[p.name] = parseFloat(netTL.toFixed(2));
+      }
+    });
+
+    return {
+      totalCents,
+      perPersonCents,
+      participantCount,
+      settlements: resolveDebts(balancesTL),
+    };
+  }
+
+  // Greedy Match — mobildeki _resolveDebts birebir
+  function resolveDebts(balances) {
+    const settlements = [];
+    const debtors = Object.entries(balances)
+      .filter(([, v]) => v < -0.01)
+      .map(([name, v]) => ({ name, amount: Math.abs(v) }));
+    const creditors = Object.entries(balances)
+      .filter(([, v]) => v > 0.01)
+      .map(([name, v]) => ({ name, amount: v }));
+
+    debtors.sort((a, b) => b.amount - a.amount);
+    creditors.sort((a, b) => b.amount - a.amount);
+
+    let d = 0, c = 0;
+    while (d < debtors.length && c < creditors.length) {
+      const pay = Math.min(debtors[d].amount, creditors[c].amount);
+      if (!isNearZero(pay)) {
+        settlements.push({
+          from: debtors[d].name,
+          to: creditors[c].name,
+          amount: parseFloat(pay.toFixed(2)),
+        });
+      }
+      debtors[d].amount -= pay;
+      creditors[c].amount -= pay;
+      if (isNearZero(debtors[d].amount)) d++;
+      if (isNearZero(creditors[c].amount)) c++;
+    }
+    return settlements;
+  }
+
+  // ── Render: Sonuçlar ────────────────────────────────────
+  function renderResults() {
+    const res = calculateBalances();
+    const box = $('#results');
+    box.classList.remove('hidden');
+
+    if (res.error) {
+      box.innerHTML = `<div class="bg-white/80 backdrop-blur rounded-2xl border border-white shadow-lg p-6 text-center slide-up">
+          <p class="text-brand-dark font-semibold">${res.error}</p>
+        </div>`;
+      box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    const settleRows = res.settlements.length
+      ? res.settlements.map((s) => `
+          <div class="bg-brand-light/60 rounded-xl p-4 border border-[#E1BEE7]">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="grid place-items-center h-9 w-9 rounded-full bg-brand text-white font-bold text-sm shrink-0">${escapeHtml(s.from.charAt(0).toUpperCase())}</span>
+                <div class="min-w-0">
+                  <p class="text-[11px] uppercase tracking-wide text-brand/60 font-semibold leading-none">Ödeyecek</p>
+                  <p class="font-bold text-brand-dark truncate">${escapeHtml(s.from)}</p>
+                </div>
+              </div>
+              <span class="font-extrabold text-brand text-lg whitespace-nowrap">${fmtTLnum(s.amount)}</span>
+            </div>
+            <div class="flex items-center gap-2 mt-2 pl-1 text-sm text-brand-dark">
+              <span class="text-brand-accent font-bold">↓</span>
+              <span class="text-[11px] uppercase tracking-wide text-brand/60 font-semibold">Alacak</span>
+              <span class="font-bold truncate">${escapeHtml(s.to)}</span>
+            </div>
+          </div>`).join('')
+      : `<div class="text-center py-4 text-brand-dark font-medium">Herkes ödeşmiş, kimse kimseye borçlu değil!</div>`;
+
+    box.innerHTML = `
+      <div class="slide-up space-y-5">
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-white/80 backdrop-blur rounded-2xl border border-white shadow-lg p-4 text-center">
+            <p class="text-[11px] uppercase tracking-wide text-brand/60 font-semibold">Toplam</p>
+            <p class="text-base sm:text-xl font-extrabold text-brand-dark mt-1 break-words">${fmtTL(res.totalCents)}</p>
+          </div>
+          <div class="bg-white/80 backdrop-blur rounded-2xl border border-white shadow-lg p-4 text-center">
+            <p class="text-[11px] uppercase tracking-wide text-brand/60 font-semibold">Kişi Başı</p>
+            <p class="text-base sm:text-xl font-extrabold text-brand mt-1 break-words">${fmtTL(Math.round(res.perPersonCents))}</p>
+          </div>
+          <div class="bg-white/80 backdrop-blur rounded-2xl border border-white shadow-lg p-4 text-center">
+            <p class="text-[11px] uppercase tracking-wide text-brand/60 font-semibold">Kişi</p>
+            <p class="text-base sm:text-xl font-extrabold text-brand-accent mt-1">${res.participantCount}</p>
+          </div>
+        </div>
+
+        <div class="bg-white/80 backdrop-blur rounded-2xl border border-white shadow-lg p-5 sm:p-6">
+          <h3 class="text-lg font-bold text-brand-dark mb-1">Kim Kime Ne Kadar Ödeyecek?</h3>
+          <p class="text-xs text-brand/60 mb-4">Aşağıdaki ödemeler yapılınca herkes ödeşmiş olur.</p>
+          <div class="space-y-2">${settleRows}</div>
+        </div>
+      </div>`;
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── Olay bağlama ────────────────────────────────────────
+  $('#personForm').addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    addPerson($('#personName').value);
+    $('#personName').value = '';
+    $('#personName').focus();
+  });
+
+  $('#expenseForm').addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    addExpense($('#expTitle').value, $('#expAmount').value, $('#expPayer').value);
+    $('#expTitle').value = '';
+    $('#expAmount').value = '';
+    $('#expTitle').focus();
+  });
+
+  $('#calcBtn').addEventListener('click', renderResults);
+
+  // İlk render
+  renderPeople();
+  renderExpenses();
+  </script>
+</body>
+</html>
