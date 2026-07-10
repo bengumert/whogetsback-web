@@ -36,7 +36,31 @@
     ::-webkit-scrollbar-thumb { background: #b39ddb; border-radius: 8px; }
   </style>
 </head>
-<body class="min-h-screen text-slate-800 font-sans antialiased">
+<body class="min-h-screen text-slate-800 font-sans antialiased pb-28 sm:pb-32">
+
+  <!-- ══════════════════════════════════════════════════════════
+       REKLAM ALANI · SOL (dikey banner 160x600)
+       Sadece geniş ekranlarda (xl ve üzeri) görünür.
+       Buraya AdSense kodunu yapıştır → aşağıdaki <!-- AD --> yorumunun yerine.
+       ══════════════════════════════════════════════════════════ -->
+  <aside class="hidden xl:flex fixed left-4 top-1/2 -translate-y-1/2 z-30 flex-col items-center">
+    <span class="text-[10px] uppercase tracking-widest text-brand/40 font-semibold mb-1">Reklam</span>
+    <div class="ad-slot w-[160px] h-[600px] rounded-xl border-2 border-dashed border-brand/20 bg-white/40 flex items-center justify-center text-xs text-brand/30">
+      <!-- AD-LEFT: AdSense kodunu buraya yapıştır -->
+      160 × 600
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════════════════════════
+       REKLAM ALANI · SAĞ (dikey banner 160x600)
+       ══════════════════════════════════════════════════════════ -->
+  <aside class="hidden xl:flex fixed right-4 top-1/2 -translate-y-1/2 z-30 flex-col items-center">
+    <span class="text-[10px] uppercase tracking-widest text-brand/40 font-semibold mb-1">Reklam</span>
+    <div class="ad-slot w-[160px] h-[600px] rounded-xl border-2 border-dashed border-brand/20 bg-white/40 flex items-center justify-center text-xs text-brand/30">
+      <!-- AD-RIGHT: AdSense kodunu buraya yapıştır -->
+      160 × 600
+    </div>
+  </aside>
 
   <div class="max-w-3xl mx-auto px-4 py-6 sm:py-10">
 
@@ -136,8 +160,23 @@
     </footer>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════════
+       REKLAM ALANI · ALT SABİT BANNER
+       Her ekranda görünür. Mobilde ~320x100, masaüstünde ~728x90.
+       Buraya AdSense kodunu yapıştır → aşağıdaki <!-- AD --> yorumunun yerine.
+       ══════════════════════════════════════════════════════════ -->
+  <div class="fixed bottom-0 inset-x-0 z-40 bg-white/85 backdrop-blur border-t border-brand/10 shadow-[0_-4px_20px_rgba(69,39,160,0.08)]">
+    <div class="max-w-3xl mx-auto px-3 py-2 flex flex-col items-center">
+      <span class="text-[9px] uppercase tracking-widest text-brand/40 font-semibold leading-none mb-1">Reklam</span>
+      <div class="ad-slot w-full max-w-[728px] h-[70px] sm:h-[90px] rounded-lg border-2 border-dashed border-brand/20 bg-white/40 flex items-center justify-center text-xs text-brand/30">
+        <!-- AD-BOTTOM: AdSense kodunu buraya yapıştır -->
+        728 × 90
+      </div>
+    </div>
+  </div>
+
   <!-- ── Toast ─────────────────────────────────────────────── -->
-  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-brand-dark text-white text-sm font-medium px-5 py-3 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-50"></div>
+  <div id="toast" class="fixed bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 bg-brand-dark text-white text-sm font-medium px-5 py-3 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-50"></div>
 
   <script>
   // ══════════════════════════════════════════════════════════
