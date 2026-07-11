@@ -38,36 +38,12 @@
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-thumb { background: #b39ddb; border-radius: 8px; }
 
-    /* Google AdSense — reklam alanları.
-       İleride reklam eklendiğinde sayfa kaymasın (CLS = 0) diye yükseklik baştan ayrılır. */
-    .adsense-slot {
-      display: block;
-      width: 100%;
-      min-height: 100px;            /* mobil */
-      overflow: hidden;
-    }
-    @media (min-width: 640px) {
-      .adsense-slot { min-height: 90px; }  /* masaüstü (leaderboard) */
-    }
   </style>
 </head>
 <body class="min-h-screen text-slate-800 font-sans antialiased">
 
-  <!-- REKLAM ALANI - SOL (dikey banner 160x600), sadece genis ekranda gorunur -->
-  <aside class="hidden xl:flex fixed left-4 top-1/2 -translate-y-1/2 z-30 flex-col items-center">
-    <span class="text-[10px] uppercase tracking-widest text-brand/40 font-semibold mb-1">Reklam</span>
-    <div id="ad-left" class="ad-slot w-[160px] h-[600px] rounded-xl border-2 border-dashed border-brand/20 bg-white/40 flex items-center justify-center text-xs text-brand/30">
-      160 × 600
-    </div>
-  </aside>
-
-  <!-- REKLAM ALANI - SAG (dikey banner 160x600) -->
-  <aside class="hidden xl:flex fixed right-4 top-1/2 -translate-y-1/2 z-30 flex-col items-center">
-    <span class="text-[10px] uppercase tracking-widest text-brand/40 font-semibold mb-1">Reklam</span>
-    <div id="ad-right" class="ad-slot w-[160px] h-[600px] rounded-xl border-2 border-dashed border-brand/20 bg-white/40 flex items-center justify-center text-xs text-brand/30">
-      160 × 600
-    </div>
-  </aside>
+  <!-- Reklam yerleşimi: Google AdSense Auto Ads tarafından otomatik yapılır.
+       (AdSense paneli → Ads → By site → Auto ads: Açık) -->
 
   <div class="max-w-3xl mx-auto px-4 py-6 sm:py-10">
 
@@ -78,11 +54,8 @@
       <h1 class="text-2xl sm:text-3xl font-extrabold text-brand tracking-tight">
         WhoGetsBack <span class="text-brand-accent font-semibold"></span>
       </h1>
-      <p class="text-sm text-brand/70 mt-1">Kayıt yok · Anlık hesaplar · Kuruşu kuruşuna hesaplaşmaa</p>
+      <p class="text-sm text-brand/70 mt-1">Kayıt yok · Anlık hesaplar · Kuruşu kuruşuna hesaplaşma</p>
     </header>
-
-    <!-- Google AdSense - Header -->
-    <div class="adsense-slot mb-6"></div>
 
     <!-- ── 1) Katılımcılar ────────────────────────────────── -->
     <section class="bg-white/80 backdrop-blur rounded-2xl shadow-lg shadow-brand/5 border border-white p-5 sm:p-6 mb-6 slide-up">
@@ -140,9 +113,6 @@
     <!-- ── 4) Sonuçlar ────────────────────────────────────── -->
     <section id="results" class="hidden"></section>
 
-    <!-- Google AdSense - Result -->
-    <div class="adsense-slot mt-6"></div>
-
     <!-- ── Mobil uygulama ─────────────────────────────────── -->
     <section class="mt-10 slide-up">
       <div class="bg-white/80 backdrop-blur rounded-2xl shadow-lg shadow-brand/5 border border-white p-6 text-center">
@@ -167,9 +137,6 @@
         </div>
       </div>
     </section>
-
-    <!-- Google AdSense - Footer -->
-    <div class="adsense-slot mt-8"></div>
 
     <footer class="text-center text-xs text-brand/50 mt-8 pb-6">
       WhoGetsBack · Kim kime ne kadar borçlu, kuruşu kuruşuna.
